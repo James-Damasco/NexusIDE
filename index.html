@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="James Damasco" />
+
+    <meta name="github" content="https://github.com/James-Damasco" />
+    <meta name="netlify" content="https://app.netlify.com/teams/james-damasco/projects" />
+    <meta name="vercel" content="https://vercel.com/james-damascos-projects" />
+
+    <meta name="description" content="Nexus IDE made by HTML, CSS and JavaScript" />
+    <meta name="tech" content="HTML, CSS and JavaScript" />
+
+    <meta name="og:github" content="https://github.com/James-Damasco" />
+    <meta name="og:netlify" content="https://app.netlify.com/teams/james-damasco/projects" />
+    <meta name="og:vercel" content="https://vercel.com/james-damascos-projects" />
+
+    <meta name="og:description" content="Nexus IDE made by HTML, CSS and JavaScript" />
+    <meta name="og:tech" content="HTML, CSS and JavaScript" />
+    <meta name="og:author" content="James Damasco" />
+
+    <link href="css/style.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com/"></script>
+    <script src="js/app.js" type="module"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        workspace: "#09090b",
+                        panel: "#18181b",
+                        border: "#27272a",
+                        accent: "#06b6b4",
+                        primary: "#8b6cf6",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+                        mono: ["Fira Code", "Consolas", "Monaco", "monospace"]
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+        rel="stylesheet">
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css" />
+    <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.5/split.min.js"
+        integrity="sha512-lNjb0qWDVvt1zfSiXufaxtlFtenve3BLbvljxuMXuSr0DE0HYp5OhX0u89uwNd6MvlX1bgJ8ulfG4JMGurs8UA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"
+        integrity="sha512-NcZdtrT77bJr4STcmsGAESr06BYGE8woZdSdEgqnpyqac7sugNO+Tr4bGwGF3MsnEkGKhU2KL2xh6Ec+BqsaHA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <title>Nexus IDE | HTML, CSS and JavaScript</title>
+    <script src="js/script.js" defer></script>
+</head>
+
+<body class="flex flex-col h-screen w-screen text-sm select-none">
+
+    <!-- Splash Screen -->
+    <div id="splash-screen"
+        class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-workspace transition-opacity duration-500">
+        <div class="relative flex items-center justify-center w-24 h-24 mb-6">
+            <div class="absolute inset-0 rounded-full border-2 border-primary/30 animate-[spin_3s_linear_infinite]">
+            </div>
+            <div
+                class="absolute inset-2 rounded-full border-2 border-t-accent border-r-accent border-b-transparent border-l-transparent animate-[spin_1.5s_linear_infinite]">
+            </div>
+            <i data-lucide="hexagon" class="w-10 h-10 text-white"></i>
+        </div>
+        <h1 class="text-3xl font-bold tracking-wider neon-text font-mono">NEXUS<span class="text-accent">.</span>IDE
+        </h1>
+        <p class="text-zinc-500 mt-2 font-mono text-xs">INITIALIZING WORKSPACE...</p>
+    </div>
+
+    <!-- Top Navigation -->
+    <nav class="h-12 border-b border-border glass-panel flex items-center justify-between px-4 z-40 shrink-0">
+        <!-- Logo & Menu (Mobile) -->
+        <div class="flex items-center gap-3">
+            <button id="mobile-menu-btn"
+                class="md:hidden p-1.5 rounded-md hover:bg-white/10 text-zinc-400 hover:text-white transition-colors">
+                <i data-lucide="menu" class="w-5 h-5"></i>
+            </button>
+            <div class="hidden md:flex items-center gap-2 text-accent">
+                <i data-lucide="hexagon" class="w-6 h-6"></i>
+                <span class="font-bold tracking-widest font-mono">NEXUS</span>
+            </div>
+
+            <!-- File Menu (Desktop) -->
+            <div class="hidden md:flex items-center gap-1 ml-4 text-xs font-medium text-zinc-400">
+                <div class="px-3 py-1.5 rounded hover:bg-white/10 hover:text-white cursor-pointer transition-colors">
+                    File</div>
+                <div class="px-3 py-1.5 rounded hover:bg-white/10 hover:text-white cursor-pointer transition-colors">
+                    Edit</div>
+                <div class="px-3 py-1.5 rounded hover:bg-white/10 hover:text-white cursor-pointer transition-colors">
+                    View</div>
+            </div>
+        </div>
+
+        <!-- Command Palette Trigger (Center) -->
+        <button id="cmd-palette-trigger"
+            class="hidden sm:flex items-center justify-between w-64 lg:w-96 bg-black/40 border border-border rounded-lg px-3 py-1.5 text-zinc-400 hover:border-zinc-600 hover:text-white transition-all cursor-text group">
+            <div class="flex items-center gap-2">
+                <i data-lucide="search" class="w-4 h-4 group-hover:text-accent transition-colors"></i>
+                <span class="text-xs">Search files or run commands</span>
+            </div>
+            <div class="flex items-center gap-1">
+                <kbd
+                    class="hidden lg:inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-mono bg-zinc-800 rounded border border-zinc-700">Ctrl</kbd>
+                <kbd
+                    class="hidden lg:inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-mono bg-zinc-800 rounded border border-zinc-700">P</kbd>
+            </div>
+        </button>
+
+        <!-- Right Actions -->
+        <div class="flex items-center gap-2">
+            <button id="btn-run"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-md bg-accent/10 text-accent hover:bg-accent hover:text-workspace font-medium transition-all text-xs border border-accent/20">
+                <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
+                <span class="hidden sm:inline">Run</span>
+            </button>
+            <div class="w-px h-5 bg-border mx-1"></div>
+            <button id="btn-toggle-ai"
+                class="p-1.5 rounded-md text-zinc-400 hover:text-primary hover:bg-primary/10 transition-colors hidden md:block"
+                title="Toggle AI Assistant">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+            </button>
+            <button class="p-1.5 rounded-md text-zinc-400 hover:text-white hover:bg-white/10 transition-colors">
+                <div
+                    class="w-6 h-6 rounded-full bg-gradient-to-tr from-accent to-primary flex items-center justify-center text-[10px] text-white font-bold">
+                    DEV
+                </div>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 flex overflow-hidden relative">
+
+        <!-- Activity Bar (Desktop Leftmost) -->
+        <aside class="hidden md:flex w-12 flex-col items-center py-4 border-r border-border bg-panel shrink-0 z-20">
+            <div class="flex flex-col gap-4 flex-1">
+                <button class="nav-icon active relative p-2 text-zinc-500 hover:text-white transition-colors group"
+                    data-panel="explorer">
+                    <i data-lucide="files" class="w-6 h-6 stroke-[1.5]"></i>
+                    <div class="absolute left-0 top-0 bottom-0 w-0.5 bg-accent rounded-r hidden active-indicator"></div>
+                </button>
+                <button class="nav-icon relative p-2 text-zinc-500 hover:text-white transition-colors group"
+                    data-panel="search">
+                    <i data-lucide="search" class="w-6 h-6 stroke-[1.5]"></i>
+                    <div class="absolute left-0 top-0 bottom-0 w-0.5 bg-accent rounded-r hidden active-indicator"></div>
+                </button>
+                <button class="nav-icon relative p-2 text-zinc-500 hover:text-white transition-colors group"
+                    data-panel="git">
+                    <i data-lucide="git-branch" class="w-6 h-6 stroke-[1.5]"></i>
+                    <div class="absolute left-0 top-0 bottom-0 w-0.5 bg-accent rounded-r hidden active-indicator"></div>
+                </button>
+            </div>
+            <div class="flex flex-col gap-4">
+                <button class="p-2 text-zinc-500 hover:text-white transition-colors">
+                    <i data-lucide="settings" class="w-6 h-6 stroke-[1.5]"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Horizontal Split Container -->
+        <div id="split-h" class="flex-1 flex overflow-hidden">
+
+            <!-- Left Sidebar (Explorer) -->
+            <div id="sidebar-left"
+                class="bg-panel border-r border-border flex flex-col hidden md:flex shrink-0 w-64 split-panel">
+                <div
+                    class="h-9 px-4 flex items-center justify-between uppercase text-[10px] font-bold text-zinc-500 tracking-wider">
+                    <span>Explorer</span>
+                    <div class="flex gap-1">
+                        <button id="btn-new-file"
+                            class="p-1 hover:text-white transition-colors hover:bg-white/5 rounded" title="New File"><i
+                                data-lucide="file-plus" class="w-3.5 h-3.5"></i></button>
+                        <button class="p-1 hover:text-white transition-colors hover:bg-white/5 rounded"
+                            title="Collapse All"><i data-lucide="collapse-all" class="w-3.5 h-3.5"></i></button>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-2" id="file-tree">
+                    <!-- File tree injected by JS -->
+                </div>
+            </div>
+
+            <!-- Center Work Area -->
+            <div id="center-area" class="flex-1 flex flex-col min-w-0 split-panel relative bg-workspace">
+
+                <!-- Vertical Split Container (Editor / Terminal) -->
+                <div id="split-v" class="flex-1 flex flex-col overflow-hidden">
+
+                    <!-- Editor Top Area -->
+                    <div id="editor-pane" class="flex-1 flex flex-col min-h-0 split-panel relative">
+                        <!-- Editor Tabs -->
+                        <div class="h-9 flex bg-panel border-b border-border overflow-x-auto no-scrollbar"
+                            id="editor-tabs">
+                            <!-- Tabs injected here -->
+                        </div>
+
+                        <!-- Breadcrumbs -->
+                        <div
+                            class="h-6 flex items-center px-4 text-xs text-zinc-500 bg-workspace/50 border-b border-border/50 font-mono gap-1">
+                            <span class="hover:text-white cursor-pointer">workspace</span>
+                            <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                            <span id="breadcrumb-current" class="text-zinc-300"></span>
+                        </div>
+
+                        <!-- Monaco Editor Container -->
+                        <div id="monaco-container" class="flex-1 relative">
+                            <!-- Loading overlay -->
+                            <div id="editor-loading"
+                                class="absolute inset-0 z-10 flex items-center justify-center bg-workspace">
+                                <div class="loader"></div>
+                            </div>
+                            <div id="monaco-editor" class="absolute inset-0"></div>
+                        </div>
+
+                        <!-- Web Preview Container (Hidden by default) -->
+                        <div id="preview-container" class="hidden flex-1 relative bg-white">
+                            <div
+                                class="absolute top-0 left-0 right-0 h-8 bg-zinc-100 border-b border-zinc-300 flex items-center px-2 z-10">
+                                <div class="flex gap-1.5 mr-4">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+                                    <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+                                    <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+                                </div>
+                                <div
+                                    class="flex-1 text-center text-xs text-zinc-500 font-mono bg-white mx-4 rounded border border-zinc-200 py-0.5">
+                                    localhost:3000</div>
+                                <button id="btn-close-preview" class="p-1 hover:bg-zinc-200 rounded text-zinc-600"><i
+                                        data-lucide="x" class="w-4 h-4"></i></button>
+                            </div>
+                            <iframe id="preview-iframe" class="w-full h-full pt-8 border-none"
+                                sandbox="allow-scripts allow-modals allow-pointer-lock allow-same-origin"></iframe>
+                        </div>
+
+                        <!-- Welcome Screen (When no files open) -->
+                        <div id="welcome-screen"
+                            class="hidden absolute inset-0 bg-workspace flex flex-col items-center justify-center z-20">
+                            <i data-lucide="hexagon" class="w-16 h-16 text-zinc-800 mb-6"></i>
+                            <h2 class="text-2xl font-bold text-zinc-300 mb-2 font-mono">Nexus Workspace</h2>
+                            <p class="text-zinc-500 mb-8 max-w-md text-center">A high-performance browser IDE for the
+                                modern web. Create a file or press <kbd
+                                    class="px-1 py-0.5 bg-zinc-800 rounded text-zinc-300 text-xs mx-1 border border-zinc-700">Ctrl+P</kbd>
+                                to execute commands.</p>
+                            <div class="flex gap-4">
+                                <button id="btn-welcome-new"
+                                    class="px-4 py-2 bg-accent text-workspace font-semibold rounded hover:bg-cyan-400 transition-colors flex items-center gap-2">
+                                    <i data-lucide="file-plus" class="w-4 h-4"></i> New File
+                                </button>
+                                <button
+                                    class="px-4 py-2 bg-zinc-800 text-white font-medium rounded hover:bg-zinc-700 transition-colors flex items-center gap-2 border border-border">
+                                    <i data-lucide="folder-open" class="w-4 h-4"></i> Open Folder
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Panel (Terminal / Output) -->
+                    <div id="bottom-panel"
+                        class="h-48 bg-panel border-t border-border flex flex-col hidden md:flex split-panel relative">
+                        <div class="flex items-center justify-between px-4 h-8 border-b border-border shrink-0">
+                            <div class="flex gap-4 text-xs font-medium tracking-wide h-full">
+                                <button
+                                    class="h-full border-b-2 border-accent text-white uppercase px-1">Terminal</button>
+                                <button
+                                    class="h-full border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 uppercase px-1 transition-colors">Problems
+                                    <span
+                                        class="bg-primary/20 text-primary px-1.5 rounded-full ml-1 text-[10px]">0</span></button>
+                                <button
+                                    class="h-full border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 uppercase px-1 transition-colors">Output</button>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="p-1 text-zinc-500 hover:text-white rounded" title="Clear"><i
+                                        data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                <button class="p-1 text-zinc-500 hover:text-white rounded" id="btn-close-terminal"
+                                    title="Close"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+                            </div>
+                        </div>
+                        <div class="flex-1 relative p-2" id="terminal-container">
+                            <!-- xterm.js mounts here -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Right Sidebar (AI Assistant) -->
+            <div id="sidebar-right"
+                class="bg-panel border-l border-border flex flex-col hidden split-panel w-80 shrink-0">
+                <div
+                    class="h-9 px-4 flex items-center justify-between uppercase text-[10px] font-bold text-zinc-500 tracking-wider border-b border-border">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-primary"></i>
+                        <span class="text-white">Nexus AI</span>
+                    </div>
+                    <button id="btn-close-ai" class="p-1 hover:text-white transition-colors hover:bg-white/5 rounded"
+                        title="Close"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 text-sm" id="ai-chat-area">
+                    <!-- AI Messages -->
+                    <div class="flex flex-col gap-1">
+                        <div class="flex items-center gap-2 text-xs text-primary font-medium mb-1">
+                            <i data-lucide="bot" class="w-4 h-4"></i> Nexus AI
+                        </div>
+                        <div
+                            class="bg-zinc-800/50 border border-zinc-700 rounded-lg rounded-tl-none p-3 text-zinc-300 leading-relaxed shadow-sm">
+                            Hello! I'm your Nexus coding assistant. I can help you write code, find bugs, or explain
+                            concepts. What are we building today?
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3 border-t border-border bg-workspace/50">
+                    <div class="relative">
+                        <textarea rows="1" placeholder="Ask Nexus..."
+                            class="w-full bg-zinc-900 border border-zinc-700 rounded-lg pl-3 pr-10 py-2.5 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-none overflow-hidden placeholder:text-zinc-600"
+                            id="ai-input"></textarea>
+                        <button
+                            class="absolute right-2 bottom-2 p-1.5 bg-primary text-white rounded-md hover:bg-violet-400 transition-colors shadow-lg shadow-primary/20">
+                            <i data-lucide="arrow-up" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                    <div class="flex gap-2 mt-2">
+                        <button
+                            class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2 py-1 rounded text-zinc-400 transition-colors">/explain</button>
+                        <button
+                            class="text-[10px] bg-zinc-800 hover:bg-zinc-700 px-2 py-1 rounded text-zinc-400 transition-colors">/refactor</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Bottom Status Bar -->
+    <footer
+        class="h-6 border-t border-border bg-panel flex items-center justify-between px-3 text-[10px] text-zinc-500 select-none z-40 shrink-0">
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-1 hover:text-white cursor-pointer transition-colors group">
+                <i data-lucide="git-branch" class="w-3 h-3 group-hover:text-accent"></i> main*
+            </div>
+            <div class="flex items-center gap-1 hover:text-white cursor-pointer transition-colors">
+                <i data-lucide="x-circle" class="w-3 h-3 text-red-500/70"></i> 0
+                <i data-lucide="alert-triangle" class="w-3 h-3 text-yellow-500/70 ml-1"></i> 0
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div id="status-cursor" class="hover:text-white cursor-pointer transition-colors">Ln 1, Col 1</div>
+            <div id="status-lang" class="hover:text-white cursor-pointer transition-colors">JavaScript</div>
+            <div class="hover:text-white cursor-pointer transition-colors">UTF-8</div>
+            <div class="flex items-center gap-1 text-accent font-medium hover:text-cyan-400 cursor-pointer">
+                <i data-lucide="check-circle-2" class="w-3 h-3"></i> Prettier
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Bottom Navigation -->
+    <div
+        class="md:hidden flex h-14 bg-panel border-t border-border w-full justify-around items-center shrink-0 pb-safe">
+        <button class="mobile-nav flex flex-col items-center gap-1 text-accent active" data-view="editor">
+            <i data-lucide="code" class="w-5 h-5"></i>
+            <span class="text-[9px] font-medium">Editor</span>
+        </button>
+        <button class="mobile-nav flex flex-col items-center gap-1 text-zinc-500 hover:text-zinc-300" data-view="files">
+            <i data-lucide="folder" class="w-5 h-5"></i>
+            <span class="text-[9px] font-medium">Files</span>
+        </button>
+        <button class="mobile-nav flex flex-col items-center gap-1 text-zinc-500 hover:text-zinc-300"
+            data-view="terminal">
+            <i data-lucide="terminal" class="w-5 h-5"></i>
+            <span class="text-[9px] font-medium">Terminal</span>
+        </button>
+        <button class="mobile-nav flex flex-col items-center gap-1 text-zinc-500 hover:text-zinc-300" data-view="ai">
+            <i data-lucide="sparkles" class="w-5 h-5"></i>
+            <span class="text-[9px] font-medium">Nexus AI</span>
+        </button>
+    </div>
+
+    <!-- Command Palette Modal -->
+    <div id="cmd-palette-modal"
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-start justify-center pt-[15vh]">
+        <div class="w-full max-w-lg bg-panel border border-border shadow-2xl rounded-xl overflow-hidden glass-panel scale-95 opacity-0 transform transition-all duration-200"
+            id="cmd-palette-content">
+            <div class="flex items-center px-3 py-2 border-b border-border bg-workspace/50">
+                <i data-lucide="chevron-right" class="w-5 h-5 text-accent mr-2"></i>
+                <input type="text" id="cmd-input"
+                    class="flex-1 bg-transparent border-none outline-none text-white placeholder-zinc-500 py-1"
+                    placeholder="Type a command...">
+            </div>
+            <div class="max-h-[60vh] overflow-y-auto p-2" id="cmd-results">
+                <!-- Populate via JS -->
+                <div class="text-[10px] uppercase font-bold text-zinc-500 px-2 py-1 mb-1">Recently Used</div>
+                <button class="w-full flex items-center px-2 py-2 rounded-lg hover:bg-accent/10 text-left group">
+                    <i data-lucide="file-plus" class="w-4 h-4 text-zinc-400 group-hover:text-accent mr-3"></i>
+                    <span class="flex-1 text-zinc-300 group-hover:text-white text-sm">Create New File</span>
+                </button>
+                <button class="w-full flex items-center px-2 py-2 rounded-lg hover:bg-accent/10 text-left group mt-1">
+                    <i data-lucide="play" class="w-4 h-4 text-zinc-400 group-hover:text-accent mr-3"></i>
+                    <span class="flex-1 text-zinc-300 group-hover:text-white text-sm">Run Web Preview</span>
+                </button>
+                <button class="w-full flex items-center px-2 py-2 rounded-lg hover:bg-accent/10 text-left group mt-1">
+                    <i data-lucide="layout" class="w-4 h-4 text-zinc-400 group-hover:text-accent mr-3"></i>
+                    <span class="flex-1 text-zinc-300 group-hover:text-white text-sm">Toggle AI Panel</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals Layer (Mobile full-screen panels) -->
+    <div id="mobile-files-modal" class="md:hidden fixed inset-0 top-12 bottom-14 bg-panel z-30 hidden flex-col">
+        <!-- Re-use the tree rendering logic inside this container on mobile -->
+        <div class="h-10 px-4 flex items-center border-b border-border font-medium text-white shadow-sm shrink-0">
+            Files
+        </div>
+        <div class="flex-1 overflow-y-auto p-2" id="mobile-file-tree"></div>
+    </div>
+
+</html>
